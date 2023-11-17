@@ -19,12 +19,25 @@ class UserSerializer(ModelSerializer):
         instance.save()
         return instance
 
-class ResumeSerializer(serializers.Serializer):
+class ResumeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Resume
-        fields = ('id', 'Title', 'education', 'experience', 'skills')
-    
+        fields = (
+        'id', 
+        'Name', 
+        'email',
+        'phone',
+        'location',
+        'education', 
+        'experience',   
+        'skills'
+        )
 
+    def create(self, validated_data):
+        return Resume.objects.create(**validated_data )
+        
+
+    
 
 class GeneratedTextSerializer(serializers.Serializer):
     generated_text = serializers.CharField()

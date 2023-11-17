@@ -62,38 +62,38 @@ class RefreshAPIView(APIView):
         })
     
 class ResumeBuilderView(APIView):
-    def get(self, request, pk=None, format =None):
+    def get(self, request, pk, format =None):
         # os.environ["OPENAI_API_KEY"] = "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"
 
         # openai.api_key = os.environ["OPENAI_API_KEY"]
-
-        openai.api_key="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"
-        try:
-            if pk:
-                resume_obj = Resume.objects.get(id=pk)
-                title = resume_obj.title()
-                experience = resume_obj.experience()
-                education = resume_obj.education()
-                prompt = f"Title: {title}\n\nabout: {experience}\n\ndomain: {education}\n\nPlease generate a concise resume summary for this profile:"
-                # Use the API to generate text
-                response = openai.Completion.create(
-                    engine='text-davinci-003',
-                    prompt=prompt,
-                    max_tokens=50
-                )
-
-        except Exception as e:
-            return HttpResponseRedirect("/")
-        print(response)
-        generated_text = response.choices[0].text
-        serializer = GeneratedTextSerializer({'generated_text': generated_text})
-        # Print the generated text
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
         
+        openai.api_key="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"
+        if pk:
+            resume_obj = Resume.objects.filter(id=pk).first()
+            title = resume_obj.Name
+            experience = resume_obj.experience
+            skills = resume_obj.skills
+            print(resume_obj.phone)
+            prompt = f"Title: {title}\n\nabout: {experience}\n\nskills: {skills}\n\nPlease generate a resume summary for this candidate by mentioning all above data, starting the sentance with name"
+            # Use the API to generate text
+            response = openai.Completion.create(
+                engine='text-davinci-003',
+                prompt=prompt,
+                max_tokens=50
+            )
+            print(response)
+            generated_text = response.choices[0].text
+            serializer = GeneratedTextSerializer({'generated_text': generated_text})
+            # Print the generated text
+            return Response(serializer.data, status=status.HTTP_200_OK)
+    
+        return HttpResponseRedirect("/")
+        
+class createResumeDataView(APIView):
     def post(self, request, format=None):
         data = request.data
-        serializer = GeneratedTextSerializer(data = data)
+        serializer = ResumeSerializer(data = data)
+        print(serializer)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status = status.HTTP_201_CREATED)

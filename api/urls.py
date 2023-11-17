@@ -1,10 +1,12 @@
 from django.contrib import admin
 from django.urls import path, include
-from .views import RegisterAPIView, LoginAPIView, RefreshAPIView,LogoutAPIView
+from .views import RegisterAPIView, LoginAPIView, RefreshAPIView,LogoutAPIView,ResumeBuilderView
 
 urlpatterns = [
     path('register/', RegisterAPIView.as_view()),
     path('login/', LoginAPIView.as_view()),
     path('logout/', LogoutAPIView.as_view()),
-    
+    path('builder/', ResumeBuilderView.as_view()),
+
+
 ]

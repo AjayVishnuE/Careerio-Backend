@@ -11,6 +11,21 @@ class User(AbstractUser):
     last_name = None
     name = None
 
+class Resume(models.Model):
+    Name = models.CharField(max_length=255 , unique=True)
+    email = models.CharField(max_length=255 , unique=True)
+    phone = models.CharField(max_length=255 , unique=True)
+    location = models.CharField(max_length=255)
+    education = models.CharField(max_length=255)
+    experience = models.CharField(max_length=255)
+    skills = models.CharField(max_length=255)
+    github = models.CharField(max_length=255 , blank=True)
+    behance = models.CharField(max_length=255 , blank=True)
+    hackerank = models.CharField(max_length=255 , unique=True)
+    summary = models.CharField(max_length=255 , unique=True)
+
+
+
 class Project(models.Model):
     title = models.CharField(max_length=100, blank=False)
     stack = models.CharField(max_length=100, blank=False)
@@ -28,7 +43,7 @@ class Company(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 class ProjectLikes(models.Model):
-    Company_id = models.ForeignKey(Company, on_delete = models.CASCADE, null = True, blank=True)
-    Project_id = models.ForeignKey(Project, on_delete = models.CASCADE, null = True, blank=True)
+    Company_id = models.ForeignKey(Company, on_delete = models.CASCADE, null = True, blank=False)
+    Project_id = models.ForeignKey(Project, on_delete = models.CASCADE, null = True, blank=False)
     created_at = models.DateTimeField(auto_now_add=True)
     

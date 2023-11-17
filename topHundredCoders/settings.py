@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 
+import os
+
+from decouple import config as decouple_config
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -38,9 +42,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'api',
+    "api.apps.ApiConfig",
     'rest_framework',
 ]
+
+REST_FRAMEWORK = {"DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",)}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -78,8 +84,12 @@ WSGI_APPLICATION = 'topHundredCoders.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        "ENGINE": decouple_config("DATABASE_ENGINE"),
+        "NAME": decouple_config("DATABASE_NAME"),
+        "USER": decouple_config("DATABASE_USER"),
+        "PASSWORD": decouple_config("DATABASE_PASSWORD"),
+        "HOST": decouple_config("DATABASE_HOST"),
+        "PORT": decouple_config("DATABASE_PORT"),
     }
 }
 

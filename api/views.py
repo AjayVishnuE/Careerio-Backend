@@ -1,14 +1,17 @@
 from rest_framework.views import APIView
+from rest_framework import status
 from django.http import HttpResponseRedirect
 from rest_framework.response import Response
 # from django.contrib.auth.mixins import LoginRequiredMixin
 from rest_framework.authentication import get_authorization_header
 from rest_framework.exceptions import APIException, AuthenticationFailed
-
 from .authentication import create_access_token, create_refresh_token, decode_access_token, decode_refresh_token
-from .serializer import UserSerializer
-from .models import User
+from .serializer import UserSerializer, GeneratedTextSerializer, ResumeSerializer
+from .models import User, Resume
+import os
+import openai
 
+# Set your API key (either in your code or as an environment variable)
 
 class RegisterAPIView(APIView):
     def post(self, request):
@@ -57,3 +60,41 @@ class RefreshAPIView(APIView):
         return Response({
             'token' : access_token
         })
+    
+class ResumeBuilderView(APIView):
+    def get(self, request, pk=None, format =None):
+        # os.environ["OPENAI_API_KEY"] = "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"
+
+        # openai.api_key = os.environ["OPENAI_API_KEY"]
+
+        openai.api_key="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"
+        try:
+            if pk:
+                resume_obj = Resume.objects.get(id=pk)
+                title = resume_obj.title()
+                experience = resume_obj.experience()
+                education = resume_obj.education()
+                prompt = f"Title: {title}\n\nabout: {experience}\n\ndomain: {education}\n\nPlease generate a concise resume summary for this profile:"
+                # Use the API to generate text
+                response = openai.Completion.create(
+                    engine='text-davinci-003',
+                    prompt=prompt,
+                    max_tokens=50
+                )
+
+        except Exception as e:
+            return HttpResponseRedirect("/")
+        print(response)
+        generated_text = response.choices[0].text
+        serializer = GeneratedTextSerializer({'generated_text': generated_text})
+        # Print the generated text
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+        
+    def post(self, request, format=None):
+        data = request.data
+        serializer = GeneratedTextSerializer(data = data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
+        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)

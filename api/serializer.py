@@ -1,5 +1,7 @@
 from rest_framework.serializers import ModelSerializer
-from .models import User
+from rest_framework import serializers
+
+from .models import User, Resume
 
 class UserSerializer(ModelSerializer):
     class Meta:
@@ -16,6 +18,15 @@ class UserSerializer(ModelSerializer):
             instance.set_password(password)
         instance.save()
         return instance
+
+class ResumeSerializer(serializers.Serializer):
+    class Meta:
+        model = Resume
+        fields = ('id', 'Title', 'education', 'experience', 'skills')
     
+
+
+class GeneratedTextSerializer(serializers.Serializer):
+    generated_text = serializers.CharField()
 
 

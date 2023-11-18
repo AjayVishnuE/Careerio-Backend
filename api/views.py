@@ -67,7 +67,7 @@ class ResumeBuilderView(APIView):
 
         # openai.api_key = os.environ["OPENAI_API_KEY"]
         
-        openai.api_key="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"
+        openai.api_key="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"
         if pk:
             resume_obj = Resume.objects.filter(id=pk).first()
             title = resume_obj.Name
@@ -79,7 +79,7 @@ class ResumeBuilderView(APIView):
             response = openai.Completion.create(
                 engine='text-davinci-003',
                 prompt=prompt,
-                max_tokens=50
+                max_tokens=50 
             )
             print(response)
             generated_text = response.choices[0].text

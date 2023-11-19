@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from rest_framework.authentication import get_authorization_header
 from rest_framework.exceptions import APIException, AuthenticationFailed
 from .authentication import create_access_token, create_refresh_token, decode_access_token, decode_refresh_token
-from .serializer import UserSerializer, GeneratedTextSerializer, ResumeSerializer
-from .models import User, Resume
+from .serializer import UserSerializer, GeneratedTextSerializer, ResumeSerializer, ProjectSerializer, GigsSerializer
+from .models import User, Resume, Projects, Gigs
 import os
 import openai
 
@@ -24,6 +24,9 @@ class RegisterAPIView(APIView):
 class LoginAPIView(APIView):
     def post(self, request):
         user = User.objects.filter(email = request.data['email']).first()
+        print(user)
+        id = user.id
+        name=user.username
 
         if not user:
             raise APIException('Invalid Credentials')
@@ -38,7 +41,9 @@ class LoginAPIView(APIView):
 
         response.set_cookie(key = 'refreshToken', value = refresh_token, httponly = True)
         response.data = {
-            'token' : access_token
+            'token' : access_token,
+            'id' : id,
+            'username':name
         }
 
         return response
@@ -67,7 +72,7 @@ class ResumeBuilderView(APIView):
 
         # openai.api_key = os.environ["OPENAI_API_KEY"]
         
-        openai.api_key="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"
+        openai.api_key="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"
         if pk:
             resume_obj = Resume.objects.filter(id=pk).first()
             title = resume_obj.Name
@@ -92,9 +97,65 @@ class ResumeBuilderView(APIView):
 class createResumeDataView(APIView):
     def post(self, request, format=None):
         data = request.data
+        token = request.headers.get('Authorization', '').split(' ')[1]
+        user_id = decode_access_token(token)
+        print(user_id)
+        print("Request Data:", request.data)
+        data['user']=user_id
         serializer = ResumeSerializer(data = data)
+        if serializer.is_valid():
+            serializer.save()
+            print("Serializer Data:", serializer.data)
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
+        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+    
+
+class createProjectsView(APIView):
+    def post(self, request, format=None):
+        data = request.data
+        token = request.headers.get('Authorization', '').split(' ')[1]
+        user_id = decode_access_token(token)
+        print(user_id)
+        print("Request Data:", request.data)
+        data['user']=user_id
+        serializer = ProjectSerializer(data = data)
+        if serializer.is_valid():
+            serializer.save()
+            print("Serializer Data:", serializer.data)
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
+        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+    
+class createGigsView(APIView):
+    def post(self, request, format=None):
+        data = request.data
+        token = request.headers.get('Authorization', '').split(' ')[1]
+        user_id = decode_access_token(token)
+        print(user_id)
+        print("Request Data:", request.data)
+        data['user']=user_id
+        serializer = GigsSerializer(data = data)
         print(serializer)
         if serializer.is_valid():
             serializer.save()
+            print("Serializer Data:", serializer.data)
             return Response(serializer.data, status = status.HTTP_201_CREATED)
+        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+
+class ProjectsDisplayView(APIView):
+    def get(self, request, pk, format =None):
+        print(pk)
+        if pk:
+            print("test")
+            queryset = Projects.objects.all().filter(user=pk)
+            print(queryset)
+            serializer = ProjectSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+    
+class GigsDisplayView(APIView):
+    def get(self, request, pk, format =None):
+        if pk:
+            queryset = Gigs.objects.all().filter(user=pk)
+            serializer = GigsSerializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)

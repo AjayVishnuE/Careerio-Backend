@@ -1,7 +1,7 @@
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 
-from .models import User, Resume
+from .models import User, Resume, Projects, Gigs
 
 class UserSerializer(ModelSerializer):
     class Meta:
@@ -30,16 +30,53 @@ class ResumeSerializer(serializers.ModelSerializer):
         'location',
         'education', 
         'experience',   
-        'skills'
+        'skills',
+        'user'
         )
 
     def create(self, validated_data):
         return Resume.objects.create(**validated_data )
         
 
-    
 
 class GeneratedTextSerializer(serializers.Serializer):
     generated_text = serializers.CharField()
 
 
+class ProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Projects
+        fields = (
+            'id', 
+            'title', 
+            'companyname',
+            'description',
+            'deliverables',
+            'stack', 
+            'user',
+            'contributers',   
+        )
+
+
+    def create(self, validated_data):
+        return Projects.objects.create(**validated_data )
+    
+    
+class GigsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Gigs
+        fields = (
+        'id', 
+        'role', 
+        'companyname',
+        'description',
+        'keyresponsibilities',
+        'qualifications', 
+        'user',
+        'duration',   
+        'amount',
+        'skills'
+        )
+
+    def create(self, validated_data):
+        return Gigs.objects.create(**validated_data )

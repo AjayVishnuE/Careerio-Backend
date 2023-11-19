@@ -41,3 +41,7 @@ class Gigs(models.Model):
     amount = models.CharField(max_length=200, default=None)
     skills = models.TextField(default=None)
 
+class Dashboard(models.Model):
+    profilevisits = models.CharField(max_length=50)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='visits')
+

@@ -1,7 +1,7 @@
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 
-from .models import User, Resume, Projects, Gigs
+from .models import User, Resume, Projects, Gigs, Dashboard
 
 class UserSerializer(ModelSerializer):
     class Meta:
@@ -18,6 +18,7 @@ class UserSerializer(ModelSerializer):
             instance.set_password(password)
         instance.save()
         return instance
+
 
 class ResumeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -38,7 +39,6 @@ class ResumeSerializer(serializers.ModelSerializer):
         return Resume.objects.create(**validated_data )
         
 
-
 class GeneratedTextSerializer(serializers.Serializer):
     generated_text = serializers.CharField()
 
@@ -56,8 +56,6 @@ class ProjectSerializer(serializers.ModelSerializer):
             'user',
             'contributers',   
         )
-
-
     def create(self, validated_data):
         return Projects.objects.create(**validated_data )
     
@@ -77,6 +75,16 @@ class GigsSerializer(serializers.ModelSerializer):
         'amount',
         'skills'
         )
-
     def create(self, validated_data):
         return Gigs.objects.create(**validated_data )
+
+
+class DashboardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Dashboard
+        fields = (
+            'id', 
+            'profilevisits'
+        )
+    def create(self, validated_data):
+        return Dashboard.objects.create(**validated_data )

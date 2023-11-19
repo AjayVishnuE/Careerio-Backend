@@ -88,3 +88,9 @@ class DashboardSerializer(serializers.ModelSerializer):
         )
     def create(self, validated_data):
         return Dashboard.objects.create(**validated_data )
+
+# class SkillSerializer(serializers.ModelSerializer):
+#     resume = ResumeSerializer(many=True, read_only=True)
+#     class Meta:
+#         model = User
+#         fields = ['id', 'username','email', 'resume']

@@ -7,7 +7,7 @@ urlpatterns = [
     path('login/', LoginAPIView.as_view()),
     path('logout/', LogoutAPIView.as_view()),
     path('createresumedata/', createResumeDataView.as_view()),
-    path('builder/<str:pk>/', ResumeBuilderView.as_view()),
+    path('builder/', ResumeBuilderView.as_view()),
     path('createproject/', createProjectsView.as_view()),
     path('projectuserlist/', ProjectsUserDisplayView.as_view()),
     path('creategig/', createGigsView.as_view()),

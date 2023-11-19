@@ -20,6 +20,7 @@ class Resume(models.Model):
     experience = models.CharField(max_length=255, default="0")
     skills = models.CharField(max_length=255, default="None")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='resume')
+    summary = models.models.TextField()
 
 class Projects(models.Model):
     title = models.CharField(max_length=255)

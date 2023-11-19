@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.authentication import get_authorization_header
 from rest_framework.exceptions import APIException, AuthenticationFailed
 from .authentication import create_access_token, create_refresh_token, decode_access_token, decode_refresh_token
-from .serializer import UserSerializer, GeneratedTextSerializer, ResumeSerializer, ProjectSerializer, GigsSerializer
+from .serializer import UserSerializer, GeneratedTextSerializer, ResumeSerializer, ProjectSerializer, GigsSerializer, SkillSerializer
 from .models import User, Resume, Projects, Gigs, Dashboard
 import os
 import openai
@@ -70,13 +70,15 @@ class RefreshAPIView(APIView):
         })
     
 class ResumeBuilderView(APIView):
-    def get(self, request, pk, format =None):
+    def get(self, request, format =None):
+        data = request.data
+        serializer1 = ResumeSerializer(data = data)
         # os.environ["OPENAI_API_KEY"] = "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"
 
         # openai.api_key = os.environ["OPENAI_API_KEY"]
         
         openai.api_key="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"
-        if pk:
+        if data:
             resume_obj = Resume.objects.filter(id=pk).first()
             title = resume_obj.Name
             experience = resume_obj.experience
@@ -91,8 +93,9 @@ class ResumeBuilderView(APIView):
             )
             print(response)
             generated_text = response.choices[0].text
-            serializer = GeneratedTextSerializer({'generated_text': generated_text})
+            serializer2 = GeneratedTextSerializer({'generated_text': generated_text})
             # Print the generated text
+
             return Response(serializer.data, status=status.HTTP_200_OK)
     
         return HttpResponseRedirect("/")
@@ -208,6 +211,14 @@ class SkillSearchView(APIView):
         queryset = Resume.objects.filter(skills__icontains=query) 
         serializer = ResumeSerializer(queryset, many=True)
         return Response(serializer.data)
+
+    # def get(self, request, format=None):
+    #     query = request.data
+    #     print(query)
+    #     queryset = Resume.objects.filter(skills__icontains=query).prefetch_related('resume')
+    #     serializer = ResumeSerializer(queryset, many=True)
+    #     return Response(serializer.data)
+
 
 class DashboardDetailsView(APIView):
     def get(self,request,format=None):
